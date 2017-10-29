@@ -69,7 +69,7 @@ for file in files_to_process:
     file_to_write = os.path.join(path_to_write, (file.split("."))[0] + ".txt")
     with open(file_to_write, 'w') as filewriter:
 
-        print(f"\nFinancial Analysis for {file}",file=filewriter)
+        print(f"\nFinancial Analysis ",file=filewriter)
         print("="*50,file=filewriter)
         print(f"Total Months: {total_months}",file=filewriter)
         print(f"Total Revenue: ${total_revenue}",file=filewriter)
