@@ -1,54 +1,66 @@
-# import glob
-# for file in glob.glob(".csv"):
-#     print(file)
+# -*- coding: UTF-8 -*-
+"""PyBank Code."""
 
-# from pathlib import Path
-# p = Path(".")
-# list(p.glob("*.py"))
-
+#import modules needed
 import os
 import csv
-files_to_process = []
+
+
+#set read and write paths
 path_to_read = "./raw_data"
 path_to_write = "./output"
+
+#get csv file names to process from input directory
+files_to_process = []
 for file in os.listdir(path_to_read):
     if file.endswith(".csv"):
         files_to_process.append(file)
 # print(files_to_process)
 
 
-
-
+#Loop through each file to process
 for file in files_to_process:
+    #init dictionary 
     financial_data = {}
 
+    #set path to read file from
     file_to_read = os.path.join(path_to_read, file)
 
+    #open file and read via dictionary object
     with open(file_to_read, 'r') as csvFile:
         dict_reader = csv.DictReader(csvFile)
+        #Loop through dictionary list and set up
+        #dictionary with date as key and revenue as value
         for row in dict_reader:
-            # print("{Date}, {Revenue}".format(**row))
-            # print(type(row["Revenue"]))
+            #set Revenue as int
             financial_data[row["Date"]] = int(row["Revenue"])
 
+    # count the keys to get total months
     total_months = len(list(financial_data.keys()))
+    # sum values to get total revenue
     total_revenue = sum(financial_data.values())
+    # calculate revenue by dividing total revenue and total months
     avg_rev_change = int(round(total_revenue / total_months ,0))
+    # get key for maximun value
     maximum_key = max(financial_data, key=financial_data.get)
+    # get value for the maximun key
     maximum_value = financial_data[maximum_key]
+    # get key for maximum value
     minimum_key = min(financial_data, key=financial_data.get)
+    # get maximum value
     minimum_value = financial_data[minimum_key]
+
+    #print to console
     print("\n"+"="*50)
     print(f"\nFinancial Analysis for {file}")
     print("\n"+"="*50)
-    # print("/n")
     print(f"Total Months: {total_months}")
     print(f"Total Revenue: ${total_revenue}")
     print(f"Average Revenue Change: ${avg_rev_change}")
     print(F"Greatest Increase in Revenue: {maximum_key} (${maximum_value})")
     print(F"Greatest Decrease in Revenue: {minimum_key} (${minimum_value})")
 
-    
+    # Open file in output directory and print output to file
     file_to_write = os.path.join(path_to_write, (file.split("."))[0] + ".txt")
     with open(file_to_write, 'w') as filewriter:
 
