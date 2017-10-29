@@ -1,30 +1,24 @@
-# import glob
-# for file in glob.glob(".csv"):
-#     print(file)
+# -*- coding: UTF-8 -*-
+"""PyBoss Code."""
 
-# from pathlib import Path
-# p = Path(".")
-# list(p.glob("*.py"))
-
+#import modules needed
 import os
 import csv
 from datetime import datetime
 
+#get csv file names to process from input directory
 files_to_process = []
 path_to_read = "./raw_data"
 path_to_output = "./output"
 for file in os.listdir(path_to_read):
     if file.endswith(".csv"):
         files_to_process.append(file)
-print(files_to_process)
-
-# filepaths = glob.glob("*.csv")
-# print(filepaths)
+#print(files_to_process)
 
 
-
+"""Returb State Abbreviation for Input State Name."""
 def get_state_abbrev(state_name):
-    """Mashes two strings together."""
+
     us_state_abbrev = {
     'Alabama': 'AL',
     'Alaska': 'AK',
@@ -80,22 +74,15 @@ def get_state_abbrev(state_name):
 
     return us_state_abbrev[state_name]
 
+"""Parse SSN and return encrypted value"""
 def encrpty_ssn(ssn):
-    """Mashes two strings together."""
 
     ssn_split = ssn.split("-")
+
     return ('*' * len(ssn_split[0])) + '-' + ('*' * len(ssn_split[1])) + '-' + ssn_split[2]
 
-def split_name(name):
-    """Mashes two strings together."""
-
-    names = name.split(" ")
-    return names[0],names[1]
-
-
   
-    
-
+#Loop through each file to process
 for file in files_to_process:
      # Set empty list variables
     id_emp = []
@@ -105,33 +92,48 @@ for file in files_to_process:
     ssn = []
     state = []
     
-   # print(files)
-
+   
+    #set path to read file from
     file_to_read = os.path.join(path_to_read, file)
-    # Open current wrestling CSV
+
+    # Create new CSV
+    newemployeeCSV = os.path.join(path_to_output, 'employee_date-' + str(datetime.today().strftime("%Y-%m-%d %H:%M")) + '.csv')
+
+
+    # Open current wrestling CSV 
     with open(file_to_read, 'r') as csvFile:
 
         csvReader = csv.reader(csvFile, delimiter=',')
 
-        # Skipp headers
+        # Skip headers
         next(csvReader, None)
         
         for row in csvReader:
 
-            # print(row)
+            # add to id_emp lisy
             id_emp.append(row[0])
-            nm_first.append(split_name(row[1])[0])
-            nm_last.append(split_name(row[1])[1])
-            
-            dob.append(datetime.strptime(row[2], "%Y-%m-%d").strftime("%d/%m/%Y"))
+            #split name and add to first and last name list
+            split_name = row[1].split(" ")
+            nm_first.append(split_name[0])
+            nm_last.append(split_name[1])
+            # read date, format and append to dob list
+            dob.append(datetime.strptime(row[2], "%Y-%m-%d").strftime("%m/%d/%Y"))
+            # parse ,encrypt ssn and append to ssn list
             ssn.append(encrpty_ssn(row[3]))
+            # look up state abreviation and append to ssn list
             state.append(get_state_abbrev(row[4]))
-           
-            
-            
+                                  
 
-# Zip lists together
+# Zip lists together for all the files read
 cleanCSV = zip(id_emp, nm_first,nm_last,dob, ssn,state)
 
-for row in cleanCSV:
-   print(row)
+
+with open(newemployeeCSV, 'w', newline="") as csvFile:
+
+        csvWriter = csv.writer(csvFile, delimiter=',')
+
+        # Write Headers into file
+        csvWriter.writerow(["Emp ID","First Name","Last Name","DOB","SSN","State"])
+
+        # Write the zipped lists to a csv
+        csvWriter.writerows(cleanCSV)
