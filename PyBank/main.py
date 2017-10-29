@@ -31,16 +31,21 @@ for file in files_to_process:
         dict_reader = csv.DictReader(csvFile)
         #Loop through dictionary list and set up
         #dictionary with date as key and revenue as value
-        for row in dict_reader:
+        sum_of_delta = 0 
+        prev_rev = 0
+        for key,item in enumerate(dict_reader):
             #set Revenue as int
-            financial_data[row["Date"]] = int(row["Revenue"])
+            financial_data[item["Date"]] = int(item["Revenue"])
+            if key > 0:
+                sum_of_delta += (int(item["Revenue"]) - prev_rev)
+                prev_rev =  int(item["Revenue"])
 
     # count the keys to get total months
     total_months = len(list(financial_data.keys()))
     # sum values to get total revenue
     total_revenue = sum(financial_data.values())
     # calculate revenue by dividing total revenue and total months
-    avg_rev_change = int(round(total_revenue / total_months ,0))
+    avg_rev_change = int(round(sum_of_delta / (total_months - 1) ,0))
     # get key for maximun value
     maximum_key = max(financial_data, key=financial_data.get)
     # get value for the maximun key
